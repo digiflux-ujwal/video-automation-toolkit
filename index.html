@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Free Video Automation Toolkit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Earthy Professional -->
+    <!-- Application Structure Plan: The application is structured as a single-page interactive toolkit, moving away from the linear format of the source report. The information architecture is designed around the user's task: finding the right free tools for their video creation workflow. It features: 1. A Hero Section to introduce the toolkit. 2. An Interactive Workflow Guide (Script -> Assets -> Edit) that acts as the primary navigation by filtering content. 3. A Tool Explorer Dashboard with filterable cards and modals for detailed information. 4. A Comparative Analysis Chart to visually compare tools on 'Commercial Viability'. 5. A Final Recommendations Checklist. This task-oriented, dashboard-like structure was chosen to empower non-linear exploration, allowing users to efficiently find solutions for their specific needs, which is more user-friendly than a static document. -->
+    <!-- Visualization & Content Choices: 1. Workflow: An HTML/CSS process flow diagram, clickable to filter tools, intuitively guiding users. 2. Tool Comparison: An interactive Chart.js bar chart comparing tools on a 'Commercial Viability Score' (derived from watermark/attribution data). This allows for quick, data-driven decisions. 3. Tool Details: A grid of HTML/CSS cards with a JS-powered modal for progressive disclosure of information, keeping the UI clean. 4. Recommendations: A simple, scannable HTML/CSS checklist for actionable takeaways. This multi-layered approach transforms a static report into an engaging and practical decision-making tool. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF7;
+            color: #4A4A4A;
+        }
+        .active-filter {
+            background-color: #C87E60 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        .modal-content {
+            transition: transform 0.25s ease;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 450px;
+            max-height: 60vh;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="app" class="container mx-auto p-4 sm:p-6 md:p-8">
+
+        <header class="text-center mb-12 md:mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#C87E60] mb-2">The Free Video Automation Toolkit</h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">An interactive guide for seasoned creators to build a cost-free, automated video production workflow using the best AI and royalty-free tools.</p>
+        </header>
+
+        <section id="workflow" class="mb-12 md:mb-16">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-2">Your 3-Phase Automated Workflow</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">This entire process, from a simple idea to a finished video, can be automated for free. Click a phase below to explore the top-rated tools for each step.</p>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-0">
+                <div class="flex items-center">
+                    <div id="phase-1-btn" class="workflow-step cursor-pointer p-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-white shadow-md border-t-4 border-transparent" data-phase="scripting">
+                        <div class="text-5xl mb-2">🎬</div>
+                        <h3 class="font-bold text-lg">Phase 1: Script & Ideation</h3>
+                        <p class="text-sm text-gray-500">Generate ideas and write compelling scripts with AI.</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center justify-center h-full text-3xl text-gray-300 mx-4 font-light transform rotate-90 md:rotate-0">&rarr;</div>
+                 <div class="flex items-center">
+                    <div id="phase-2-btn" class="workflow-step cursor-pointer p-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-white shadow-md border-t-4 border-transparent" data-phase="assets">
+                        <div class="text-5xl mb-2">🖼️🎵</div>
+                        <h3 class="font-bold text-lg">Phase 2: Asset Sourcing</h3>
+                        <p class="text-sm text-gray-500">Find royalty-free visuals, voiceovers, and music.</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center justify-center h-full text-3xl text-gray-300 mx-4 font-light transform rotate-90 md:rotate-0">&rarr;</div>
+                <div class="flex items-center">
+                    <div id="phase-3-btn" class="workflow-step cursor-pointer p-4 rounded-lg text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-white shadow-md border-t-4 border-transparent" data-phase="editing">
+                        <div class="text-5xl mb-2">✂️✨</div>
+                        <h3 class="font-bold text-lg">Phase 3: Assembly & Editing</h3>
+                        <p class="text-sm text-gray-500">Assemble assets and polish your final video.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main id="tool-explorer" class="bg-[#EAE2D8]/50 p-4 sm:p-8 rounded-2xl">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-2">Tool Explorer</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">Filter our curated list of free tools to find the perfect fit for your project. The best tools are completely free for commercial use, with no watermarks or required attribution.</p>
+            
+            <div id="filters" class="flex flex-wrap justify-center gap-2 mb-8">
+                <button data-filter="all" class="filter-btn px-4 py-2 text-sm font-semibold bg-white rounded-full shadow-sm transition-all duration-200 hover:bg-gray-100 active-filter">All Tools</button>
+                <button data-filter="scripting" class="filter-btn px-4 py-2 text-sm font-semibold bg-white rounded-full shadow-sm transition-all duration-200 hover:bg-gray-100">Script & Ideation</button>
+                <button data-filter="visuals" class="filter-btn px-4 py-2 text-sm font-semibold bg-white rounded-full shadow-sm transition-all duration-200 hover:bg-gray-100">Visuals</button>
+                <button data-filter="voiceover" class="filter-btn px-4 py-2 text-sm font-semibold bg-white rounded-full shadow-sm transition-all duration-200 hover:bg-gray-100">Voiceover (TTS)</button>
+                <button data-filter="music" class="filter-btn px-4 py-2 text-sm font-semibold bg-white rounded-full shadow-sm transition-all duration-200 hover:bg-gray-100">Music</button>
+                <button data-filter="editing" class="filter-btn px-4 py-2 text-sm font-semibold bg-white rounded-full shadow-sm transition-all duration-200 hover:bg-gray-100">Editing & Assembly</button>
+            </div>
+
+            <div id="tool-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            </div>
+        </main>
+        
+        <section id="comparison" class="my-12 md:my-20">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-2">Comparative Analysis</h2>
+            <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">How commercially viable are these free tools? This chart scores each tool based on its free tier limitations. A higher score means fewer restrictions (no watermarks, no required attribution) for professional use.</p>
+            <div class="chart-container bg-white p-4 rounded-xl shadow-md">
+                <canvas id="toolsChart"></canvas>
+            </div>
+        </section>
+
+        <section id="recommendations" class="bg-[#EAE2D8]/50 p-6 sm:p-8 rounded-2xl">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">Key Recommendations for Success</h2>
+            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-sm flex items-start gap-4">
+                    <div class="text-2xl text-[#C87E60] font-bold">1</div>
+                    <div>
+                        <h3 class="font-bold mb-1">Adopt a Modular Toolset</h3>
+                        <p class="text-gray-600 text-sm">Don't search for a single 'do-it-all' free tool. The best strategy is to combine specialized tools for each phase: scripting, assets, voiceover, and editing.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm flex items-start gap-4">
+                    <div class="text-2xl text-[#C87E60] font-bold">2</div>
+                    <div>
+                        <h3 class="font-bold mb-1">Scrutinize "Free" Tiers</h3>
+                        <p class="text-gray-600 text-sm">Always check the fine print. "Free" can mean watermarks, usage caps, or no commercial license. Prioritize tools that explicitly state "no watermark" and "commercial use allowed."</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm flex items-start gap-4">
+                    <div class="text-2xl text-[#C87E60] font-bold">3</div>
+                    <div>
+                        <h3 class="font-bold mb-1">Embrace Content Repurposing</h3>
+                        <p class="text-gray-600 text-sm">Use AI tools like SendShort to efficiently convert existing long-form content (articles, blog posts) into engaging short-form videos to maximize your reach.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm flex items-start gap-4">
+                    <div class="text-2xl text-[#C87E60] font-bold">4</div>
+                    <div>
+                        <h3 class="font-bold mb-1">Maintain Quality Control</h3>
+                        <p class="text-gray-600 text-sm">Automation is for efficiency, not replacing your expertise. Always review and refine AI output to ensure it meets your brand's quality standards and voice.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center mt-16 pt-8 border-t border-gray-200">
+            <p class="text-sm text-gray-500">Interactive report generated from source material on automating free social media video creation.</p>
+        </footer>
+
+    </div>
+
+    <div id="tool-modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div id="modal-content" class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 transform scale-95">
+            <div class="flex justify-between items-start mb-4">
+                <h3 id="modal-title" class="text-2xl font-bold"></h3>
+                <button id="close-modal-btn" class="text-2xl text-gray-500 hover:text-black">&times;</button>
+            </div>
+            <div id="modal-body">
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toolData = [
+                { name: 'CapCut', category: ['editing', 'scripting'], score: 10, bestFor: 'All-in-one script-to-video and editing.', details: 'Generates scripts and converts them to video with stock footage. Offers a multi-track editor and templates. Its biggest advantage is providing watermark-free exports for commercial use in its free tier.', license: '✅ No Watermark, ✅ Commercial Use', phase: ['scripting', 'editing'] },
+                { name: 'Restream AI Script Generator', category: ['scripting'], score: 10, bestFor: 'Rapidly generating unlimited script ideas.', details: 'A completely free online tool for generating video scripts with customizable tones. No account is needed, and data is private. Excellent for brainstorming.', license: '✅ No Limits, ✅ Commercial Use', phase: ['scripting'] },
+                { name: 'SendShort', category: ['editing', 'scripting'], score: 10, bestFor: 'Repurposing articles into videos.', details: 'Converts long-form text like articles into engaging videos with AI-generated visuals, audio, and captions. Resizes for different social platforms automatically.', license: '✅ 100% Free, ✅ Commercial Use', phase: ['scripting', 'editing'] },
+                { name: 'Coverr', category: ['visuals'], score: 10, bestFor: 'High-quality, no-attribution stock videos.', details: 'A vast library of free HD and 4K stock videos. All clips are royalty-free and, crucially, require no attribution for commercial projects.', license: '✅ No Attribution, ✅ Commercial Use', phase: ['assets'] },
+                { name: 'Pexels & Pixabay', category: ['visuals'], score: 10, bestFor: 'No-attribution stock photos and videos.', details: 'Both platforms offer a massive collection of photos and videos under licenses (like CC0) that allow free commercial use without any need for attribution.', license: '✅ No Attribution, ✅ Commercial Use', phase: ['assets'] },
+                { name: 'TTSMaker', category: ['voiceover'], score: 10, bestFor: 'Professional text-to-speech with commercial rights.', details: 'A highly valuable free TTS tool with many voices and languages. The free tier gives you 100% audio copyright and commercial rights with no attribution needed.', license: '✅ No Attribution, ✅ Commercial Use', phase: ['assets'] },
+                { name: 'YouTube Audio Library', category: ['music'], score: 9, bestFor: 'Copyright-safe music for monetized videos.', details: 'A huge library of music and sound effects. Use the filter to find tracks with a standard license that do not require any attribution for commercial use.', license: '✅ No Attribution (Filter required)', phase: ['assets'] },
+                { name: 'Kdenlive', category: ['editing'], score: 10, bestFor: 'Advanced, open-source desktop editing.', details: 'A professional-grade, free, open-source video editor for Windows, Mac, and Linux. Offers powerful features like multi-track editing and color correction, comparable to paid software.', license: '✅ Open Source, ✅ Commercial Use', phase: ['editing'] },
+                { name: 'Invideo AI', category: ['editing', 'scripting'], score: 3, bestFor: 'Quickly generating watermarked drafts.', details: 'Generates videos from text but has significant free-tier limitations. Exports include an Invideo watermark, making it unsuitable for a professional, unbranded look.', license: '⚠️ Includes Watermark', phase: ['scripting', 'editing'] },
+                { name: 'Freepik', category: ['visuals', 'music'], score: 5, bestFor: 'Assets for projects where attribution is okay.', details: 'Offers high-quality free videos and music, but attribution is required for all free assets. This can clutter your video description or credits.', license: '⚠️ Attribution Required', phase: ['assets'] },
+                { name: 'Vecteezy', category: ['visuals'], score: 5, bestFor: 'Assets for projects where attribution is okay.', details: 'Provides a large library of free HD/4K videos and photos that are safe for commercial use, but attribution is required under their Free license.', license: '⚠️ Attribution Required', phase: ['assets'] },
+                { name: 'ElevenLabs', category: ['voiceover'], score: 2, bestFor: 'High-quality voices for personal projects.', details: 'Produces very human-like voices, but the free tier is highly restrictive. It requires attribution and, critically, does NOT include a commercial license.', license: '🚫 No Commercial License', phase: ['assets'] },
+            ];
+            
+            const toolGrid = document.getElementById('tool-grid');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const workflowSteps = document.querySelectorAll('.workflow-step');
+            
+            const modal = document.getElementById('tool-modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+
+            let currentFilter = 'all';
+            let chart;
+
+            function createToolCard(tool) {
+                const card = document.createElement('div');
+                card.className = 'tool-card bg-white p-5 rounded-xl shadow-sm cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1';
+                card.dataset.category = tool.category.join(' ');
+
+                let licenseClass = '';
+                if(tool.license.includes('✅')) licenseClass = 'bg-green-100 text-green-800';
+                else if(tool.license.includes('⚠️')) licenseClass = 'bg-yellow-100 text-yellow-800';
+                else licenseClass = 'bg-red-100 text-red-800';
+
+                card.innerHTML = `
+                    <h3 class="font-bold text-lg mb-1">${tool.name}</h3>
+                    <p class="text-sm text-gray-500 mb-3 h-10">${tool.bestFor}</p>
+                    <div class="flex justify-between items-center">
+                       <span class="text-xs font-semibold px-2 py-1 rounded-full ${licenseClass}">${tool.license}</span>
+                       <span class="text-[#C87E60] font-bold text-sm">Details &rarr;</span>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openModal(tool));
+                return card;
+            }
+
+            function renderTools(filter = 'all') {
+                toolGrid.innerHTML = '';
+                currentFilter = filter;
+                const filteredData = filter === 'all' 
+                    ? toolData 
+                    : toolData.filter(tool => tool.category.includes(filter) || tool.phase.includes(filter));
+                
+                filteredData.sort((a,b) => b.score - a.score).forEach(tool => {
+                    toolGrid.appendChild(createToolCard(tool));
+                });
+                updateChart(filter);
+            }
+
+            function setActiveFilter(filter) {
+                 filterButtons.forEach(btn => {
+                    btn.classList.toggle('active-filter', btn.dataset.filter === filter);
+                 });
+                 workflowSteps.forEach(step => {
+                     const phaseBtn = step.id.includes('phase-1') ? 'scripting' : step.id.includes('phase-2') ? 'assets' : 'editing';
+                     const isActive = filter === phaseBtn || (filter ==='all' && step.dataset.phase === phaseBtn);
+                     step.classList.toggle('border-[#C87E60]', isActive);
+                 });
+            }
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const filter = button.dataset.filter;
+                    setActiveFilter(filter);
+                    renderTools(filter);
+                });
+            });
+
+            workflowSteps.forEach(step => {
+                step.addEventListener('click', () => {
+                    const phase = step.dataset.phase;
+                    const targetFilter = (phase === 'scripting' || phase === 'editing') ? phase : 'assets';
+                    setActiveFilter(targetFilter);
+                    renderTools(targetFilter);
+                    document.getElementById('tool-explorer').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            function openModal(tool) {
+                modalTitle.textContent = tool.name;
+                
+                let categoriesHTML = tool.category.map(cat => `<span class="bg-gray-200 text-gray-700 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${cat.charAt(0).toUpperCase() + cat.slice(1)}</span>`).join('');
+
+                modalBody.innerHTML = `
+                    <p class="mb-4 text-gray-600">${tool.details}</p>
+                    <div class="mb-4">
+                        <strong class="block text-sm text-gray-800 mb-1">Categories:</strong>
+                        ${categoriesHTML}
+                    </div>
+                     <div class="mb-4">
+                        <strong class="block text-sm text-gray-800 mb-1">Best For:</strong>
+                        <p class="text-gray-600">${tool.bestFor}</p>
+                    </div>
+                    <div class="p-4 rounded-lg ${tool.license.includes('✅') ? 'bg-green-50 border-l-4 border-green-500' : tool.license.includes('⚠️') ? 'bg-yellow-50 border-l-4 border-yellow-500' : 'bg-red-50 border-l-4 border-red-500'}">
+                        <strong class="block text-sm text-gray-800 mb-1">Free Tier License:</strong>
+                        <p class="font-semibold ${tool.license.includes('✅') ? 'text-green-800' : tool.license.includes('⚠️') ? 'text-yellow-800' : 'text-red-800'}">${tool.license}</p>
+                    </div>
+                `;
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modalContent.classList.remove('scale-95');
+            }
+
+            function closeModal() {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modalContent.classList.add('scale-95');
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            function updateChart(filter = 'all') {
+                const filteredData = filter === 'all' 
+                    ? toolData 
+                    : toolData.filter(tool => tool.category.includes(filter) || tool.phase.includes(filter));
+                
+                filteredData.sort((a,b) => a.score - b.score);
+
+                const labels = filteredData.map(d => d.name);
+                const data = filteredData.map(d => d.score);
+                const backgroundColors = filteredData.map(d => {
+                    if (d.score > 8) return 'rgba(200, 126, 96, 0.7)'; // Main accent
+                    if (d.score > 4) return 'rgba(234, 226, 216, 1)'; // Secondary
+                    return 'rgba(211, 211, 211, 0.7)'; // Gray
+                });
+                const borderColors = filteredData.map(d => {
+                    if (d.score > 8) return 'rgba(200, 126, 96, 1)';
+                    if (d.score > 4) return 'rgba(200, 186, 172, 1)';
+                    return 'rgba(190, 190, 190, 1)';
+                });
+
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = data;
+                chart.data.datasets[0].backgroundColor = backgroundColors;
+                chart.data.datasets[0].borderColor = borderColors;
+                chart.update();
+            }
+
+            function initializeChart() {
+                const ctx = document.getElementById('toolsChart').getContext('2d');
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Commercial Viability Score (out of 10)',
+                            data: [],
+                            backgroundColor: [],
+                            borderColor: [],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 10,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)'
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            label += context.parsed.x;
+                                        }
+                                        const toolName = context.label;
+                                        const tool = toolData.find(t => t.name === toolName);
+                                        if(tool) {
+                                            return `${tool.name}: ${tool.score}/10 - ${tool.license}`;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            initializeChart();
+            renderTools('all');
+        });
+    </script>
+</body>
+</html>
